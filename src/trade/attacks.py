@@ -346,7 +346,7 @@ class AttacksCog(commands.Cog):
             view_images.add_item(Button(label="<", style=discord.ButtonStyle.primary))
             view_images.add_item(Button(label=">", style=discord.ButtonStyle.primary))
             embed_profile.set_image(url=view_images.mode[view_images.index].embeds[0].image.url)
-            embed_profile.set_footer(text=f"Art Fight Profile | {"Attacks Sent" if atk_msgs_exist else "Attacks Recieved"}", icon_url=interaction.guild.icon.url)
+            embed_profile.set_footer(text=f"Art Fight Profile | {'Attacks Sent' if atk_msgs_exist else 'Attacks Recieved'}", icon_url=interaction.guild.icon.url)
             
             async def atk_button_callback(interaction: discord.Interaction):
                 view_images.mode = atk_msgs
