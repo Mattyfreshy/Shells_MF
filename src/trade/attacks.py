@@ -299,9 +299,14 @@ class AttacksCog(commands.Cog):
                         v_sent += f"[{message_id}]({message_url})\n"
                         
                         # add to list of attack Message Objects
-                        msg_obj = await interaction.channel.fetch_message(message_id)
-                        atk_msgs.append(msg_obj)
-                
+                        try:
+                            msg_obj = await interaction.channel.fetch_message(message_id)
+                            atk_msgs.append(msg_obj)
+                        except Exception as e:
+                            print(f"Error fetching attack message: [{message_id}]")
+                            print(e)
+                            pass
+                            
                 received_dictionary = specified_user.get("attacks_received")
                 v_received = ""
                 if received_dictionary == None:
@@ -312,8 +317,13 @@ class AttacksCog(commands.Cog):
                         v_received += f"[{message_id}]({message_url})\n"
                         
                         # add to list of defense Message Objects
-                        # msg_obj = await interaction.channel.fetch_message(message_id)
-                        # def_msgs.append(msg_obj)
+                        try:
+                            msg_obj = await interaction.channel.fetch_message(message_id)
+                            def_msgs.append(msg_obj)
+                        except Exception as e:
+                            print(f"Error fetching defense message: [{message_id}]")
+                            print(e)
+                            pass
                         
                 v_oclink = specified_user.get("oclink")
                 #v_oclink = f"[{v_oclink}]({v_oclink})"
