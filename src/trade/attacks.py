@@ -263,6 +263,9 @@ class AttacksCog(commands.Cog):
     
     @af.command(name="profile", description="shows a user\'s profile including points and attack info")
     async def profile(self, interaction: discord.Interaction, user: discord.Member):
+        # Deferring response to prevent timeout/exceptions
+        await interaction.response.defer(ephemeral=True, thinking=True)
+        
         profile_info = ""
         user_dictionary = self.db_ref_users.get()
         
@@ -339,63 +342,66 @@ class AttacksCog(commands.Cog):
         # pagination of attack images using left and right buttons
         view_images = View()
         # index and mode tracker
-        # view_images.index = 0
-        # view_images.mode = None
-        # atk_msgs_exist = atk_msgs and len(atk_msgs) > 0
-        # def_msgs_exist = def_msgs and len(def_msgs) > 0
+        view_images.index = 0
+        view_images.mode = None
+        atk_msgs_exist = atk_msgs and len(atk_msgs) > 0
+        def_msgs_exist = def_msgs and len(def_msgs) > 0
         
-        # # atk and def image mode buttons |atk| |def|
-        # if atk_msgs_exist:
-        #     view_images.add_item(Button(label="Attacks", style=discord.ButtonStyle.primary))
-        #     view_images.mode = atk_msgs
-        # if def_msgs_exist:
-        #     view_images.add_item(Button(label="Defenses", style=discord.ButtonStyle.primary))
-        #     view_images.mode = def_msgs if view_images.mode == None else atk_msgs
+        # atk and def image mode buttons |atk| |def|
+        if atk_msgs_exist:
+            view_images.add_item(Button(label="Attacks", style=discord.ButtonStyle.primary))
+            view_images.mode = atk_msgs
+        if def_msgs_exist:
+            view_images.add_item(Button(label="Defenses", style=discord.ButtonStyle.primary))
+            view_images.mode = def_msgs if view_images.mode == None else atk_msgs
 
-        # if view_images.mode:
-        #     view_images.add_item(Button(label="<", style=discord.ButtonStyle.primary))
-        #     view_images.add_item(Button(label=">", style=discord.ButtonStyle.primary))
-        #     embed_profile.set_image(url=view_images.mode[view_images.index].embeds[0].image.url)
-        #     embed_profile.set_footer(text=f"Art Fight Profile | {'Attacks Sent' if atk_msgs_exist else 'Attacks Recieved'}", icon_url=interaction.guild.icon.url)
+        if view_images.mode:
+            view_images.add_item(Button(label="<", style=discord.ButtonStyle.primary))
+            view_images.add_item(Button(label=">", style=discord.ButtonStyle.primary))
+            embed_profile.set_image(url=view_images.mode[view_images.index].embeds[0].image.url)
+            embed_profile.set_footer(text=f"Art Fight Profile | {'Attacks Sent' if atk_msgs_exist else 'Attacks Recieved'}", icon_url=interaction.guild.icon.url)
             
-        #     async def atk_button_callback(interaction: discord.Interaction):
-        #         view_images.mode = atk_msgs
-        #         view_images.index = 0
-        #         embed_profile.set_image(url=view_images.mode[0].embeds[0].image.url)
-        #         embed_profile.set_footer(text="Art Fight Profile | Attacks Sent", icon_url=interaction.guild.icon.url)
-        #         await interaction.response.edit_message(embed=embed_profile, view=view_images)
+            async def atk_button_callback(interaction: discord.Interaction):
+                view_images.mode = atk_msgs
+                view_images.index = 0
+                embed_profile.set_image(url=view_images.mode[0].embeds[0].image.url)
+                embed_profile.set_footer(text="Art Fight Profile | Attacks Sent", icon_url=interaction.guild.icon.url)
+                await interaction.response.edit_message(embed=embed_profile, view=view_images)
             
-        #     async def def_button_callback(interaction: discord.Interaction):
-        #         view_images.mode = def_msgs
-        #         view_images.index = 0
-        #         embed_profile.set_image(url=view_images.mode[0].embeds[0].image.url)
-        #         embed_profile.set_footer(text="Art Fight Profile | Attacks Received", icon_url=interaction.guild.icon.url)
-        #         await interaction.response.edit_message(embed=embed_profile, view=view_images)
+            async def def_button_callback(interaction: discord.Interaction):
+                view_images.mode = def_msgs
+                view_images.index = 0
+                embed_profile.set_image(url=view_images.mode[0].embeds[0].image.url)
+                embed_profile.set_footer(text="Art Fight Profile | Attacks Received", icon_url=interaction.guild.icon.url)
+                await interaction.response.edit_message(embed=embed_profile, view=view_images)
             
-        #     async def next_button_callback(interaction: discord.Interaction):
-        #         # edit embed image to next attack using index
-        #         embed_profile.set_image(url=view_images.mode[(view_images.index+1) % len(view_images.mode)].embeds[0].image.url)
-        #         view_images.index = (view_images.index+1) % len(view_images.mode)
-        #         await interaction.response.edit_message(embed=embed_profile, view=view_images)
+            async def next_button_callback(interaction: discord.Interaction):
+                # edit embed image to next attack using index
+                embed_profile.set_image(url=view_images.mode[(view_images.index+1) % len(view_images.mode)].embeds[0].image.url)
+                view_images.index = (view_images.index+1) % len(view_images.mode)
+                await interaction.response.edit_message(embed=embed_profile, view=view_images)
             
-        #     async def prev_button_callback(interaction: discord.Interaction):
-        #         # edit embed image to previous attack using index
-        #         embed_profile.set_image(url=view_images.mode[(view_images.index-1) % len(view_images.mode)].embeds[0].image.url)
-        #         view_images.index = (view_images.index-1) % len(view_images.mode)
-        #         await interaction.response.edit_message(embed=embed_profile, view=view_images)
+            async def prev_button_callback(interaction: discord.Interaction):
+                # edit embed image to previous attack using index
+                embed_profile.set_image(url=view_images.mode[(view_images.index-1) % len(view_images.mode)].embeds[0].image.url)
+                view_images.index = (view_images.index-1) % len(view_images.mode)
+                await interaction.response.edit_message(embed=embed_profile, view=view_images)
             
-        #     view_children_indexer = 0
-        #     if atk_msgs_exist:
-        #         view_images.children[view_children_indexer].callback = atk_button_callback
-        #         view_children_indexer += 1
-        #     if def_msgs_exist:
-        #         view_images.children[view_children_indexer].callback = def_button_callback
-        #         view_children_indexer += 1
-        #     view_images.children[view_children_indexer].callback = prev_button_callback
-        #     view_images.children[view_children_indexer+1].callback = next_button_callback
+            view_children_indexer = 0
+            if atk_msgs_exist:
+                view_images.children[view_children_indexer].callback = atk_button_callback
+                view_children_indexer += 1
+            if def_msgs_exist:
+                view_images.children[view_children_indexer].callback = def_button_callback
+                view_children_indexer += 1
+            view_images.children[view_children_indexer].callback = prev_button_callback
+            view_images.children[view_children_indexer+1].callback = next_button_callback
 
-        
-        await interaction.response.send_message("", embed=embed_profile, view=view_images, ephemeral=True)
+        try:
+            await interaction.followup.send("", embed=embed_profile, view=view_images, ephemeral=True)
+        except Exception as e:
+            print(f"Error sending profile embed: {e}")
+            await interaction.followup.send("An error occured while trying to send the profile embed", ephemeral=True)
     
     @af.command(name="editprofile", description="Allows exisitng users to add links to OCs and preference notes (blanks fields stay the same)")
     async def editprofile(self, interaction: discord.Interaction, new_oc_link: str = "", new_notes: str = ""):
