@@ -264,7 +264,7 @@ class AttacksCog(commands.Cog):
     @af.command(name="profile", description="shows a user\'s profile including points and attack info")
     async def profile(self, interaction: discord.Interaction, user: discord.Member):
         # Deferring response to prevent timeout/exceptions
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True, thinking=True)
         
         profile_info = ""
         user_dictionary = self.db_ref_users.get()
